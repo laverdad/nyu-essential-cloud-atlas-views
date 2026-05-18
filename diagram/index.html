@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <style>
+    body { background: #fff; margin: 40px; font-family: sans-serif; }
+    .mermaid { max-width: 1200px; margin: auto; }
+  </style>
+</head>
+<body>
+  <div class="mermaid">
+flowchart TD
+    subgraph GitHub["GitHub"]
+        REPO["essentialproject/\nessential-view-builder-mcp"]
+    end
+
+    subgraph Laptop["Laptop"]
+        subgraph DockerDesktop["Docker Desktop"]
+            BUILD["docker build"]
+            IMAGE["MCP Server\nDocker Image"]
+            CONTAINER["MCP Server\nContainer\n(running)"]
+            BUILD --> IMAGE --> CONTAINER
+        end
+
+        subgraph ClaudeCode["Claude Code"]
+            CC["Claude Code CLI"]
+            MCPCONFIG["MCP config\n(claude_desktop_config.json)"]
+            MCPCONFIG --> CC
+        end
+
+        subgraph EssentialViewer["Essential Viewer (Tomcat)"]
+            VIEWER["Essential Viewer\nServer"]
+            BROWSER["Browser\n(rendered HTML)"]
+            VIEWER --> BROWSER
+        end
+    end
+
+    subgraph MCPTools["MCP Server Tools"]
+        T1["suggest_view_architecture\n(advisory — no code)"]
+        T2["generate_api_scaffold\n(outputs XSLT → JSON)"]
+        T3["generate_view_scaffold\n(outputs XSL → HTML)"]
+        T4["adapt_external_view\n(ports HTML/JS demo → XSL)"]
+        T5["read_viewer_file\n(reads source tree)"]
+        T6["escape_xsl_content\n(utility)"]
+        T7["wrap_in_cdata\n(utility)"]
+    end
+
+    subgraph Output["Generated Files"]
+        API["API .xsl file"]
+        VIEW["View .xsl file"]
+    end
+
+    REPO -->|"git clone + \ndocker build"| BUILD
+    CC -->|"MCP protocol\nover stdio/socket"| CONTAINER
+    CONTAINER --> MCPTools
+    T1 -->|"API + structure\nrecommendations"| CC
+    T2 --> API
+    T3 --> VIEW
+    T4 --> VIEW
+    API -->|"deploy to viewer"| VIEWER
+    VIEW -->|"deploy to viewer"| VIEWER
+  </div>
+  <script>
+    mermaid.initialize({ startOnLoad: true, theme: 'default', flowchart: { useMaxWidth: false } });
+  </script>
+</body>
+</html>
