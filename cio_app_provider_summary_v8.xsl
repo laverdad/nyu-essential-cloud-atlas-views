@@ -540,6 +540,20 @@
                             .replace(/&gt;/g, '&amp;gt;');
                     }
 
+                    /* URL sanitiser for hrefs sourced from data. Allows http(s), mailto,
+                       and protocol-relative URLs; rejects javascript:, data:, file:, etc.
+                       Bare values like "www.google.com" are auto-prefixed with https://. */
+                    function safeUrl(u) {
+                        if (!u) { return null; }
+                        var s = String(u).trim();
+                        if (!s) { return null; }
+                        if (/^https?:\/\//i.test(s))               { return s; }
+                        if (/^mailto:/i.test(s))                   { return s; }
+                        if (/^\/\//.test(s))                       { return s; }
+                        if (/^[a-zA-Z][a-zA-Z0-9+.\-]*:/.test(s))  { return null; }
+                        return 'https://' + s;
+                    }
+
                     function isCritical(app) {
                         var v = (app.businessCriticality || '').toLowerCase();
                         return v.indexOf('mission') &gt;= 0 || (v.indexOf('critical') &gt;= 0 &amp;&amp; v.indexOf('not') &lt; 0);
@@ -1120,10 +1134,14 @@
                         if (app.externalLinks &amp;&amp; app.externalLinks.length &gt; 0) {
                             html += '&lt;ul&gt;';
                             for (var li = 0; li &lt; app.externalLinks.length; li++) {
-                                var u = safeStr(app.externalLinks[li].url);
-                                if (u) {
-                                    html += '&lt;li&gt;&lt;a href="' + escapeHtml(u) + '" target="_blank" rel="noopener noreferrer"&gt;' +
-                                            escapeHtml(u) + '&lt;/a&gt;&lt;/li&gt;';
+                                var raw  = safeStr(app.externalLinks[li].url);
+                                var safe = safeUrl(raw);
+                                if (safe) {
+                                    /* href uses the sanitised URL so disallowed schemes
+                                       (javascript:, data:, ...) cannot fire; the visible
+                                       label preserves what was originally entered. */
+                                    html += '&lt;li&gt;&lt;a href="' + escapeHtml(safe) + '" target="_blank" rel="noopener noreferrer"&gt;' +
+                                            escapeHtml(raw) + '&lt;/a&gt;&lt;/li&gt;';
                                 }
                             }
                             html += '&lt;/ul&gt;';

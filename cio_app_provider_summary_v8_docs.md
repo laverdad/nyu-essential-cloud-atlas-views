@@ -26,7 +26,7 @@ Renders the **Application Summary** — a single-app detail view showing ownersh
 | Purpose | `application_provider_purpose` slot → `Application_Provider_Purpose` instances (name shown) |
 | Regulations | `ea_subject_to_regulations` slot → join instance → `regulated_component_regulation` slot → `Regulation` instances (name shown). The view drills past the join (whose own name is a composed display string) so only the plain regulation name is rendered. |
 | Services Provided | `provides_application_services` slot → `Application_Service_Provision` instances → `implementing_application_service` slot → `Application_Service` instances (name shown). The view drills past the Provision (whose own name is a composed "App X as Service Y" display string) so only the plain service name is rendered. |
-| External References | `external_reference_links` slot → `External_Reference` instances → `external_reference_url` slot. The URL itself is used as both `href` and the visible link label. |
+| External References | `external_reference_links` slot → `External_Reference` instances → `external_reference_url` slot. The URL is sanitised client-side: only `http://`, `https://`, `mailto:`, and protocol-relative `//` schemes are allowed in the `href`; bare values like `www.google.com` are auto-prefixed with `https://`; other schemes (`javascript:`, `data:`, `file:`, etc.) are rejected and the link is not rendered. The visible link label shows the URL exactly as entered. |
 
 All four reference-list resolutions are scoped to `$param1`, so they touch only the instances directly linked from the current application.
 
