@@ -6,8 +6,8 @@ Renders the **Application Summary** — a single-app detail view showing ownersh
 ## Parameters
 | Parameter | Description |
 |---|---|
-| `param1` | The application instance ID, passed via the `PMA` URL parameter — the standard EAS platform convention for identifying the subject `Application_Provider` or `Composite_Application_Provider` instance of a report. Used server-side for cost and reference-list resolution. |
-| `viewScopeTermIds` | Declared and parsed by the EAS framework but not applied in this view — no effect |
+| `param1` | The application instance ID, passed via the `PMA` URL parameter — the standard Essential Project platform convention for identifying the subject `Application_Provider` or `Composite_Application_Provider` instance of a report. Used server-side for cost and reference-list resolution. |
+| `viewScopeTermIds` | Declared and parsed by the Essential Project platform but not applied in this view — no effect |
 
 ## Data sources
 
@@ -106,7 +106,7 @@ Clickable links open in a new tab with `rel="noopener noreferrer"`. Entries with
 
 ## Navigation
 - Back link returns to `cio_app_portfolio_table_charts_v20.xsl`
-- The `PMA` URL parameter is the standard EAS platform convention for passing the subject instance ID to a report view; here it identifies the `Application_Provider` or `Composite_Application_Provider` being summarised
+- The `PMA` URL parameter is the standard Essential Project platform convention for passing the subject instance ID to a report view; here it identifies the `Application_Provider` or `Composite_Application_Provider` being summarised
 - Page `<title>` updates dynamically to `<App Name> — Application Summary`
 
 ## Related files

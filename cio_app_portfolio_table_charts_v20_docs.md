@@ -7,7 +7,7 @@ Renders the **Application Atlas** — a filterable, sortable table of all applic
 | Parameter | Description |
 |---|---|
 | `param1` | Reserved (not used by this view) |
-| `viewScopeTermIds` | Declared and parsed by the EAS framework but not applied in this view — no effect |
+| `viewScopeTermIds` | Declared and parsed by the Essential Project platform but not applied in this view — no effect |
 
 ## Data sources
 
@@ -79,7 +79,7 @@ A universal free-text search box in the toolbar searches across all visible colu
 CSV export of all currently visible and filtered rows.
 
 ## Navigation
-App name cells link to `cio_app_provider_summary_v8.xsl?PMA=<appId>`. `PMA` is the standard EAS platform convention for passing the subject instance ID to a report view; here it carries the `Application_Provider` or `Composite_Application_Provider` instance ID.
+App name cells link to `cio_app_provider_summary_v8.xsl?PMA=<appId>`. `PMA` is the standard Essential Project platform convention for passing the subject instance ID to a report view; here it carries the `Application_Provider` or `Composite_Application_Provider` instance ID.
 
 ## Related files
 | File | Relationship |
