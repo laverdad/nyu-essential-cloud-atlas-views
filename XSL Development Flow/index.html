@@ -55,7 +55,8 @@ flowchart TD
     end
 
     REPO -->|"git clone + \ndocker build"| BUILD
-    CC -->|"MCP protocol\nover stdio/socket"| CONTAINER
+    CC --> MCPLINK(["MCP protocol\nover stdio/socket"])
+    MCPLINK --> CONTAINER
     CONTAINER --> MCPTools
     T1 -->|"API + structure\nrecommendations"| CC
     T2 -->|"API scaffold"| CC
@@ -71,6 +72,8 @@ flowchart TD
     API -->|"manual upload\nvia web UI"| CONSOLE
     VIEW -->|"manual upload\nvia web UI"| CONSOLE
     VIEWER -->|"serves rendered HTML"| BROWSER
+
+    style MCPLINK fill:none,stroke:#999,stroke-width:1px,stroke-dasharray:4 3,color:#555
   </div>
   <script>
     mermaid.initialize({ startOnLoad: true, theme: 'default', flowchart: { useMaxWidth: false } });
