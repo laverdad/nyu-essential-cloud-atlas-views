@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
   <style>
     body { background: #fff; margin: 40px; font-family: sans-serif; }
     .mermaid { max-width: 1200px; margin: auto; }
@@ -13,6 +13,7 @@
 flowchart TD
     subgraph GitHub["GitHub"]
         REPO["essentialproject/\nessential-view-builder-mcp"]
+        VIEWSREPO["NYUeServ/\nEA-Essential-Views"]
     end
 
     subgraph Laptop["Laptop"]
@@ -29,11 +30,18 @@ flowchart TD
             MCPCONFIG --> CC
         end
 
-        subgraph EssentialViewer["Essential Viewer (Tomcat)"]
-            VIEWER["Essential Viewer\nServer"]
-            BROWSER["Browser\n(rendered HTML)"]
-            VIEWER --> BROWSER
+        subgraph Output["Generated Files"]
+            API["API .xsl file"]
+            VIEW["View .xsl file"]
         end
+
+        BROWSER["Browser\n(rendered HTML)"]
+    end
+
+    subgraph EssentialCloud["Essential Cloud (SaaS)"]
+        CONSOLE["View Management\nConsole (web UI)"]
+        VIEWER["Essential Viewer\nServer"]
+        CONSOLE -->|"publishes views"| VIEWER
     end
 
     subgraph MCPTools["MCP Server Tools"]
@@ -46,20 +54,23 @@ flowchart TD
         T7["wrap_in_cdata\n(utility)"]
     end
 
-    subgraph Output["Generated Files"]
-        API["API .xsl file"]
-        VIEW["View .xsl file"]
-    end
-
     REPO -->|"git clone + \ndocker build"| BUILD
     CC -->|"MCP protocol\nover stdio/socket"| CONTAINER
     CONTAINER --> MCPTools
     T1 -->|"API + structure\nrecommendations"| CC
-    T2 --> API
-    T3 --> VIEW
-    T4 --> VIEW
-    API -->|"deploy to viewer"| VIEWER
-    VIEW -->|"deploy to viewer"| VIEWER
+    T2 -->|"API scaffold"| CC
+    T3 -->|"view scaffold"| CC
+    T4 -->|"ported view draft"| CC
+    T5 -->|"existing view source"| CC
+    T6 -->|"escaped content"| CC
+    T7 -->|"CDATA-wrapped content"| CC
+    CC -->|"authors + refines\nfinal XSL"| API
+    CC -->|"authors + refines\nfinal XSL"| VIEW
+    API -->|"git commit + push"| VIEWSREPO
+    VIEW -->|"git commit + push"| VIEWSREPO
+    API -->|"manual upload\nvia web UI"| CONSOLE
+    VIEW -->|"manual upload\nvia web UI"| CONSOLE
+    VIEWER -->|"serves rendered HTML"| BROWSER
   </div>
   <script>
     mermaid.initialize({ startOnLoad: true, theme: 'default', flowchart: { useMaxWidth: false } });
