@@ -22,7 +22,7 @@ Renders the **Application Summary** — a single-app detail view showing ownersh
 |---|---|
 | Data Sensitivity | `al_security_classifications` slot → `Security_Classification` instances |
 | Supplier | `ap_supplier` slot → `Supplier` instances |
-| Annual Cost | `Cost` and cost component instances scoped to `$param1`; currency symbol from the `Default Currency` Report_Constant |
+| Annual Cost | `Cost` and cost component instances scoped to `$param1` — see [Annual Cost computation](#annual-cost-computation) |
 | Purpose | `application_provider_purpose` slot → `Application_Provider_Purpose` instances (name shown) |
 | Regulations | `ea_subject_to_regulations` slot → join instance → `regulated_component_regulation` slot → `Regulation` instances (name shown). The view drills past the join (whose own name is a composed display string) so only the plain regulation name is rendered. |
 | Services Provided | `provides_application_services` slot → `Application_Service_Provision` instances → `implementing_application_service` slot → `Application_Service` instances (name shown). The view drills past the Provision (whose own name is a composed "App X as Service Y" display string) so only the plain service name is rendered. |
@@ -30,7 +30,17 @@ Renders the **Application Summary** — a single-app detail view showing ownersh
 
 All four reference-list resolutions are scoped to `$param1`, so they touch only the instances directly linked from the current application.
 
-Only cost components considered current as of the render date are included in the total. The date logic applied per component (`cc_cost_start_date_iso_8601` / `cc_cost_end_date_iso_8601`):
+## Annual Cost computation
+The cost total is built server-side for the single application identified by `$param1`:
+
+1. Find all `Cost` instances whose `costs_for_element` **or** `cost_for_elements` slot references the application. Both slot names are checked because deployments vary on the spelling.
+2. Resolve each `Cost`'s `cost_components` slot to its component instances — typically `Annual_Cost_Component` or `Adhoc_Cost_Component`. Components are matched by ID, so any cost-component subtype is included automatically (one-off adhoc charges count toward the total alongside annual ones).
+3. Keep only components that are current as of the render date (date logic below).
+4. Sum `cc_cost_amount` across the surviving components, counting **positive values only** — negative amounts (e.g. credits) are excluded.
+
+The currency symbol comes from the `Default Currency` Report_Constant, defaulting to `$` if unset.
+
+Date logic per component (`cc_cost_start_date_iso_8601` / `cc_cost_end_date_iso_8601`):
 
 | Start date | End date | Included if |
 |---|---|---|
@@ -39,7 +49,7 @@ Only cost components considered current as of the render date are included in th
 | Absent | Present | (End − 5 years) ≤ today ≤ End |
 | Present | Present | Start ≤ today ≤ End |
 
-Only components with a positive `cc_cost_amount` are summed. Dates must be valid ISO 8601 (`YYYY-MM-DD`) to be recognised; blank or malformed values are treated as absent.
+Dates must be valid ISO 8601 (`YYYY-MM-DD`) to be recognised; blank or malformed values are treated as absent.
 
 ## Sections rendered
 
@@ -62,7 +72,7 @@ At-a-glance summary badges displayed at the top of the page:
 | Data Sensitivity | `al_security_classifications` → `Security_Classification` | Server-side XSL |
 | SSO Protected | `inIList` / `outIList` — the application's inbound and outbound interface lists as returned by the `busCapAppMartApps` API; each entry is checked for the substrings `oauth2`, `saml2`, `pam`, or `entra` (case-insensitive). If any interface matches, the app is flagged as SSO-protected. | API |
 | Lifecycle Status | `lifecycle_status_application_provider` | API |
-| Annual Cost | `costs_for_element` / `cost_for_elements` on `Cost`; `cc_cost_amount` on components | Server-side XSL |
+| Annual Cost | See [Annual Cost computation](#annual-cost-computation) | Server-side XSL |
 
 ### Ownership
 
@@ -89,7 +99,7 @@ At-a-glance summary badges displayed at the top of the page:
 |---|---|---|
 | User Base | `User Base` | API |
 | User Population | `User Population` | API |
-| Annual Cost | `costs_for_element` / `cost_for_elements` on `Cost`; `cc_cost_amount` on components | Server-side XSL |
+| Annual Cost | See [Annual Cost computation](#annual-cost-computation) | Server-side XSL |
 
 ### Services Provided
 

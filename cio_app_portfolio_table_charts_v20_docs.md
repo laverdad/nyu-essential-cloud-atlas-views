@@ -22,9 +22,19 @@ Renders the **Application Atlas** — a filterable, sortable table of all applic
 |---|---|
 | Data Sensitivity | `al_security_classifications` slot → `Security_Classification` instances |
 | Supplier | `ap_supplier` slot → `Supplier` instances |
-| Annual Cost | `Cost` and cost component instances; currency symbol from the `Default Currency` Report_Constant |
+| Annual Cost | `Cost` and cost component instances — see [Annual Cost computation](#annual-cost-computation) |
 
-Only cost components considered current as of the render date are included in the total. The date logic applied per component (`cc_cost_start_date_iso_8601` / `cc_cost_end_date_iso_8601`):
+## Annual Cost computation
+The cost total for each application is built server-side as follows:
+
+1. Find all `Cost` instances whose `costs_for_element` **or** `cost_for_elements` slot references the application. Both slot names are checked because deployments vary on the spelling.
+2. Resolve each `Cost`'s `cost_components` slot to its component instances — typically `Annual_Cost_Component` or `Adhoc_Cost_Component`. Components are matched by ID, so any cost-component subtype is included automatically (one-off adhoc charges count toward the total alongside annual ones).
+3. Keep only components that are current as of the render date (date logic below).
+4. Sum `cc_cost_amount` across the surviving components, counting **positive values only** — negative amounts (e.g. credits) are excluded.
+
+The currency symbol comes from the `Default Currency` Report_Constant, defaulting to `$` if unset.
+
+Date logic per component (`cc_cost_start_date_iso_8601` / `cc_cost_end_date_iso_8601`):
 
 | Start date | End date | Included if |
 |---|---|---|
@@ -33,7 +43,7 @@ Only cost components considered current as of the render date are included in th
 | Absent | Present | (End − 5 years) ≤ today ≤ End |
 | Present | Present | Start ≤ today ≤ End |
 
-Only components with a positive `cc_cost_amount` are summed. Dates must be valid ISO 8601 (`YYYY-MM-DD`) to be recognised; blank or malformed values are treated as absent.
+Dates must be valid ISO 8601 (`YYYY-MM-DD`) to be recognised; blank or malformed values are treated as absent.
 
 ## Columns
 All columns can be toggled via the column-chooser menu.
@@ -53,7 +63,7 @@ All columns can be toggled via the column-chooser menu.
 | User Base | `User Base` | API | |
 | User Population | `User Population` | API | |
 | Supplier | `ap_supplier` → `Supplier` instances | Server-side XSL | |
-| Annual Cost | `costs_for_element` / `cost_for_elements` on `Cost`; `cc_cost_amount` on components | Server-side XSL | Currency from Default Currency constant |
+| Annual Cost | See [Annual Cost computation](#annual-cost-computation) | Server-side XSL | |
 
 ## Filters
 A universal free-text search box in the toolbar searches across all visible columns simultaneously. Below that, a collapsible per-column filter panel with a Reset button provides more targeted filtering. Input type varies by column:
